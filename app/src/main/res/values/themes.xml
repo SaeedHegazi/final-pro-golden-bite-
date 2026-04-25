@@ -1,9 +1,19 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!-- Base app theme: no global colorPrimary — accents are set per component or via overlays. -->
     <style name="Base.Theme.GoldenBite" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.GoldenBite.MaterialAlertDialog</item>
+        <!-- Focus / cursor emphasis (not colorPrimary): text fields, spinners -->
+        <item name="colorControlActivated">@color/button_yellow</item>
+        <item name="android:colorControlActivated">@color/button_yellow</item>
     </style>
 
     <style name="Theme.GoldenBite" parent="Base.Theme.GoldenBite" />
+
+    <!-- Material alert actions (e.g. delete confirm): yellow / orange without setting app-wide primary. -->
+    <style name="ThemeOverlay.GoldenBite.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorPrimary">@color/button_yellow</item>
+        <item name="colorOnPrimary">@color/button_yellow_text</item>
+        <item name="colorSecondary">@color/button_orange</item>
+        <item name="colorOnSecondary">@color/button_on_orange</item>
+    </style>
 </resources>

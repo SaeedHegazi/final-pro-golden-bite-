@@ -1,7 +1,14 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
     <style name="Base.Theme.GoldenBite" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.GoldenBite.MaterialAlertDialog</item>
+        <item name="colorControlActivated">@color/button_yellow</item>
+        <item name="android:colorControlActivated">@color/button_yellow</item>
+    </style>
+
+    <style name="ThemeOverlay.GoldenBite.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorPrimary">@color/button_yellow</item>
+        <item name="colorOnPrimary">@color/button_yellow_text</item>
+        <item name="colorSecondary">@color/button_orange</item>
+        <item name="colorOnSecondary">@color/button_on_orange</item>
     </style>
 </resources>

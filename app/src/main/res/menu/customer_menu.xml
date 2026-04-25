@@ -30,13 +30,5 @@
         android:orderInCategory="400">
 
     </item>
-    <item
-        android:title="AI"
-        android:id="@+id/ai"
-        android:icon="@drawable/chatbot"
-        android:orderInCategory="500">
-
-    </item>
-
 
 </menu>

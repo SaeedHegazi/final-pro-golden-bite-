@@ -27,7 +27,7 @@ public class adminSettingsFrag extends Fragment{
         View view=inflater.inflate(R.layout.fragment_admin_settings, container, false);
         listView = view.findViewById(R.id.listSettings);
         myList = new ArrayList<>();
-        myList.add("Today's Profits");
+        myList.add("Golden Bite's Orders");
         myList.add("Golden Bite's Menu");
         adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, myList);
         listView.setAdapter(adapter);
@@ -36,16 +36,14 @@ public class adminSettingsFrag extends Fragment{
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position == 0){
-                    Toast.makeText(getContext(), "sassa", Toast.LENGTH_SHORT).show();
-                    Intent intent=new Intent(getContext(), todaysProfits.class);
+                    Intent intent=new Intent(getContext() , Orders.class);
                     startActivity(intent);
                 }
                 if (position == 1){
-                    Toast.makeText(getContext(), "sassdasdsafa", Toast.LENGTH_SHORT).show();
-
                     Intent intent=new Intent(getContext(), adminMenu.class);
                     startActivity(intent);
                 }
+
             }
         });
 

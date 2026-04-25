@@ -25,6 +25,21 @@
             android:layout_marginTop="50dp"
             android:orientation="vertical">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="50dp"
+                android:text="Category"
+                android:textSize="18sp" />
+
+            <Spinner
+                android:id="@+id/category_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="50dp"
+                android:minWidth="200dp"
+                android:entries="@array/menu_categories" />
+
             <EditText
                 android:id="@+id/name"
                 android:layout_marginLeft="50dp"
@@ -85,7 +100,9 @@
             android:layout_height="wrap_content"
             android:textSize="25dp"
             android:layout_gravity="center"
-            android:text="choose a picture"/>
+            android:text="choose a picture"
+            android:backgroundTint="@color/button_orange"
+            android:textColor="@color/button_on_orange" />
 
         <Button
             android:id="@+id/addProduct"
@@ -94,7 +111,9 @@
             android:layout_height="wrap_content"
             android:textSize="25dp"
             android:layout_gravity="center"
-            android:text="add product"/>
+            android:text="add product"
+            android:backgroundTint="@color/button_yellow"
+            android:textColor="@color/button_yellow_text" />
 
 
 

@@ -6,11 +6,15 @@
         android:name="android.hardware.camera"
         android:required="false" />
 
-    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
         android:allowBackup="true"
@@ -21,11 +25,30 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.GoldenBite">
+        <receiver
+            android:name=".OrderReminderReceiver"
+            android:exported="false" />
+        <receiver
+            android:name=".BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+
+        </receiver>
         <activity
-            android:name=".addProduct"
+            android:name=".BaseActivity"
             android:exported="false" />
         <activity
-            android:name=".todaysProfits"
+            android:name=".Orders"
+            android:exported="false" />
+        <activity
+            android:name=".EditProductActivity"
+            android:exported="false" />
+        <activity
+            android:name=".addProduct"
             android:exported="false" />
         <activity
             android:name=".adminMenu"

@@ -22,6 +22,9 @@
 <com.google.android.material.bottomnavigation.BottomNavigationView
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    app:itemIconTint="@color/bottom_nav_item_tint"
+    app:itemTextColor="@color/bottom_nav_item_tint"
+    app:itemActiveIndicatorStyle="@style/App.Custom.Indicator"
     app:menu="@menu/admin_menu"
     android:id="@+id/adminNav"
     android:layout_alignParentBottom="true"

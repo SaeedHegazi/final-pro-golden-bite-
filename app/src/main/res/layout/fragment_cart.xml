@@ -1,14 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
     tools:context=".cartFrag">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Order" />
+        android:layout_height="wrap_content"
+        android:text="@string/cart_title"
+        android:textSize="24sp"
+        android:textStyle="bold" />
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/cart_empty"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/cart_empty"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/cart_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="12dp"
+        android:layout_weight="1"
+        tools:listitem="@layout/item_cart" />
+
+    <EditText
+        android:id="@+id/cart_customer_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:hint="Customer name"
+        android:inputType="textPersonName|textCapWords"
+        android:importantForAutofill="yes"
+        android:minHeight="48dp" />
+
+    <EditText
+        android:id="@+id/cart_phone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="Phone number"
+        android:inputType="phone"
+        android:importantForAutofill="yes"
+        android:minHeight="48dp" />
+
+    <CheckBox
+        android:id="@+id/cart_delivery"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Delivery"
+        app:buttonTint="@color/accent_control_yellow" />
+
+    <CheckBox
+        android:id="@+id/cart_cash"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cash"
+        app:buttonTint="@color/accent_control_orange" />
+
+    <CheckBox
+        android:id="@+id/cart_visa"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Visa"
+        app:buttonTint="@color/accent_control_yellow" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/cart_card_number"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:hint="Card number"
+            android:inputType="number"
+            android:maxLength="19"
+            android:minHeight="48dp" />
+
+        <EditText
+            android:id="@+id/cart_card_expiry"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:hint="MM/YY"
+            android:inputType="text"
+            android:minHeight="48dp" />
+
+        <EditText
+            android:id="@+id/cart_card_cvv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="CVC"
+            android:inputType="numberPassword"
+            android:maxLength="4"
+            android:minHeight="48dp" />
+
+
+        <Spinner
+            android:id="@+id/spinnerCountries"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/cart_order"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:minHeight="48dp"
+        android:text="Order"
+        android:backgroundTint="@color/button_yellow"
+        android:textColor="@color/button_yellow_text" />
+
+</LinearLayout>

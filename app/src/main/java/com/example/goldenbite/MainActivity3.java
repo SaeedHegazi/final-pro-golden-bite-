@@ -16,7 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
-public class MainActivity3 extends AppCompatActivity {
+public class MainActivity3 extends BaseActivity {
     private BottomNavigationView adminNav1;
     public static FrameLayout adminOrdersP,adminSettingsP;
     private adminOrderFrag adOrder;
@@ -27,6 +27,8 @@ public class MainActivity3 extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main3);
+
+
         adminOrdersP = findViewById(R.id.adminOrderF);
         adminSettingsP = findViewById(R.id.adminSettingsF);
         adOrder=new adminOrderFrag();

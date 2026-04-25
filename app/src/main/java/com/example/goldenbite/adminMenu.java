@@ -2,22 +2,34 @@ package com.example.goldenbite;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.ListView;
+import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class adminMenu extends AppCompatActivity {
+import com.bumptech.glide.Glide;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.util.ArrayList;
+import java.util.List;
 
+public class adminMenu extends BaseActivity {
+
+    private RecyclerView productsRecycler;
+    private final List<Product> products = new ArrayList<>();
+    private ProductListAdapter adapter;
+    private String selectedCategory;
+    private Product selectedProduct;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,19 +37,144 @@ public class adminMenu extends AppCompatActivity {
         setContentView(R.layout.activity_admin_menu);
 
 
+        Spinner spinner = findViewById(R.id.change_category_spinner);
+        productsRecycler = findViewById(R.id.change_products_recycler);
+        productsRecycler.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new ProductListAdapter(products, this::onProductSelected);
+        productsRecycler.setAdapter(adapter);
 
+        String[] categories = getResources().getStringArray(R.array.menu_categories);
+        selectedCategory = categories[0];
 
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedCategory = categories[position];
+                loadProductsByCategory(selectedCategory);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
+
+        loadProductsByCategory(selectedCategory);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (selectedCategory != null) {
+            loadProductsByCategory(selectedCategory);
+        }
+    }
+
+    private void onProductSelected(Product product) {
+        selectedProduct = product;
+    }
+
+    private void loadProductsByCategory(String category) {
+        FirebaseFirestore.getInstance()
+                .collection("Product")
+                .whereEqualTo("category", category)
+                .get()
+                .addOnSuccessListener(this, snapshot -> {
+                    products.clear();
+                    for (QueryDocumentSnapshot doc : snapshot) {
+                        String docId = doc.getId();
+                        String name = doc.getString("name");
+                        Long priceLong = doc.getLong("price");
+                        Long sizeLong = doc.getLong("size");
+                        String description = doc.getString("description");
+                        if (description == null) description = doc.getString("descirption");
+                        String imagUrl = doc.getString("imagUrl");
+                        String cat = doc.getString("category");
+
+                        int price = priceLong != null ? priceLong.intValue() : 0;
+                        int size = sizeLong != null ? sizeLong.intValue() : 0;
+                        Product p = new Product(docId, name != null ? name : "", price, size,
+                                description != null ? description : "", imagUrl != null ? imagUrl : "", cat);
+                        products.add(p);
+                    }
+                    adapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(this, e -> {
+                    Toast.makeText(this, "Failed to load products", Toast.LENGTH_SHORT).show();
+                    products.clear();
+                    adapter.notifyDataSetChanged();
+                });
+    }
 
     public void goBack(View view) {
-        Intent intent = new Intent(adminMenu.this, MainActivity2.class);
+        Intent intent = new Intent(adminMenu.this, MainActivity3.class);
         startActivity(intent);
     }
 
     public void addP(View view) {
         Intent intent = new Intent(adminMenu.this, addProduct.class);
         startActivity(intent);
+    }
 
+    public void editProduct(View view) {
+        if (selectedProduct == null) {
+            Toast.makeText(this, "Select a product to edit", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Intent intent = new Intent(adminMenu.this, EditProductActivity.class);
+        intent.putExtra(EditProductActivity.EXTRA_PRODUCT_DOC_ID, selectedProduct.getDocumentId());
+        startActivity(intent);
+    }
+
+    private interface OnProductClickListener {
+        void onProductClick(Product product);
+    }
+
+    private static class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.ViewHolder> {
+        private final List<Product> list;
+        private final OnProductClickListener listener;
+
+        ProductListAdapter(List<Product> list, OnProductClickListener listener) {
+            this.list = list;
+            this.listener = listener;
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_product, parent, false);
+            return new ViewHolder(v);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            Product p = list.get(position);
+            holder.name.setText(p.getName());
+            holder.description.setText(p.getDescription());
+            holder.price.setText(String.valueOf(p.getPrice()));
+            String url = p.getImagUrl();
+            if (url != null && !url.isEmpty()) {
+                Glide.with(holder.image.getContext()).load(url).centerCrop().into(holder.image);
+            } else {
+                holder.image.setImageDrawable(null);
+            }
+            holder.itemView.setOnClickListener(v -> listener.onProductClick(p));
+        }
+
+        @Override
+        public int getItemCount() {
+            return list.size();
+        }
+
+        static class ViewHolder extends RecyclerView.ViewHolder {
+            final ImageView image;
+            final TextView name, description, price;
+
+            ViewHolder(View itemView) {
+                super(itemView);
+                image = itemView.findViewById(R.id.product_image);
+                name = itemView.findViewById(R.id.product_name);
+                description = itemView.findViewById(R.id.product_description);
+                price = itemView.findViewById(R.id.product_price);
+            }
+        }
     }
 }

@@ -21,24 +21,25 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
+    public boolean isLogin = false, isAdmin = false;
     private Button s,l;
-    private EditText e,p,ephone;
+    private EditText e,p;
     private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
         s=findViewById(R.id.signup);
         l=findViewById(R.id.login);
         e=findViewById(R.id.email);
         p=findViewById(R.id.password);
-        ephone=findViewById(R.id.phone);
 
         auth=FirebaseAuth.getInstance();
 
-        //login as an admin and as a customer
 
         l.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,18 +63,16 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isComplete()){
+                            isLogin = true;
                             Intent intent;
                             String pass= p.getText().toString();
                             if (pass.equals("admin")){
+                                isAdmin = true;
                                 Toast.makeText(MainActivity.this, "signed in", Toast.LENGTH_LONG).show();
                                 intent = new Intent(MainActivity.this, MainActivity3.class);
                                 startActivity(intent);
                             }
                             else {
-                                String phone = ephone.getText().toString().trim();
-                                if (phone.isEmpty()){
-                                    Toast.makeText(MainActivity.this, "you will need your phone number later", Toast.LENGTH_LONG).show();
-                                }
                                 Toast.makeText(MainActivity.this, "signed in", Toast.LENGTH_LONG).show();
                                 intent = new Intent(MainActivity.this, MainActivity2.class);
                                 startActivity(intent);

@@ -6,8 +6,13 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -30,22 +35,37 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class addProduct extends AppCompatActivity {
+public class addProduct extends BaseActivity {
     String imageUrl;
 
     Button pickImg, addProduct;
-    EditText etname,etprice,etsize,etdescription;
+    EditText etname, etprice, etsize, etdescription;
+    Spinner categorySpinner;
+    String selectedCategory = Product.CATEGORY_HOT_DRINKS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_product);
+
+
         pickImg = findViewById(R.id.choosePicture);
-        addProduct  = findViewById(R.id.addProduct);
-        etname =findViewById(R.id.name);
+        addProduct = findViewById(R.id.addProduct);
+        etname = findViewById(R.id.name);
         etprice = findViewById(R.id.price);
         etsize = findViewById(R.id.size);
         etdescription = findViewById(R.id.description);
+        categorySpinner = findViewById(R.id.category_spinner);
+        categorySpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String[] categories = getResources().getStringArray(R.array.menu_categories);
+                selectedCategory = categories[position];
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
 
 
 
@@ -59,26 +79,37 @@ public class addProduct extends AppCompatActivity {
         });
 
         addProduct.setOnClickListener(v -> {
-            if (!(etname == null || etdescription == null || etprice == null || etsize == null)){
-                String name = etname.getText().toString().trim();
-                String description = etdescription.getText().toString().trim();
-                int price = Integer.parseInt(etprice.getText().toString());
-                int size = Integer.parseInt(etsize.getText().toString());
+            String name = etname.getText().toString().trim();
+            String description = etdescription.getText().toString().trim();
+            String priceStr = etprice.getText().toString().trim();
+            String sizeStr = etsize.getText().toString().trim();
 
-                if (size > 2 || size < 0){
-                    Toast.makeText(this, "size must be between 0-2", Toast.LENGTH_SHORT).show();
-                }
-
-                if (imageUrl.isEmpty()){
-                    Toast.makeText(this, "image must be added", Toast.LENGTH_SHORT).show();
-                }
-
-                Product p = new Product(name,price,size,description,imageUrl);
-                p.saveProduct();
+            if (name.isEmpty() || description.isEmpty() || priceStr.isEmpty() || sizeStr.isEmpty()) {
+                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+                return;
             }
-            else {
-                Toast.makeText(this, "please fill all fields", Toast.LENGTH_SHORT).show();
+            if (imageUrl == null || imageUrl.isEmpty()) {
+                Toast.makeText(this, "Image must be added", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            int price;
+            int size;
+            try {
+                price = Integer.parseInt(priceStr);
+                size = Integer.parseInt(sizeStr);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Price and size must be numbers", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (size > 2 || size < 0) {
+                Toast.makeText(this, "Size must be between 0-2", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Product p = new Product(name, price, size, description, imageUrl, selectedCategory);
+            p.saveProduct();
+            Toast.makeText(this, "Product added", Toast.LENGTH_SHORT).show();
         });
 
 

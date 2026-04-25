@@ -7,23 +7,43 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <androidx.cardview.widget.CardView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="20dp"
+        app:cardCornerRadius="30dp"
+        app:cardElevation="0dp">
+
+        <ImageView
+            android:id="@+id/myImageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/app"
+            android:scaleType="centerCrop" />
+
+    </androidx.cardview.widget.CardView>
+
     <TextView
+        android:id="@+id/textViewTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Golden bite"
-        android:textSize="50dp"
-        android:layout_margin="79dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="Golden Bite"
+        android:textSize="50sp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="170dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.292" />
+        app:layout_constraintVertical_bias="0.0" />
+
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="email                                         "
-        android:layout_marginTop="190dp"
+        android:layout_marginTop="260dp"
         android:id="@+id/email"
         android:inputType="textEmailAddress"
         android:layout_marginHorizontal="85dp">
@@ -34,23 +54,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="password                                   "
-        android:layout_marginTop="270dp"
+        android:layout_marginTop="340dp"
         android:inputType="textPassword"
         android:id="@+id/password"
         android:layout_marginHorizontal="85dp">
 
     </EditText>
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:hint="phone number                                   "
-        android:layout_marginTop="350dp"
-        android:inputType="phone"
-        android:id="@+id/phone"
-        android:layout_marginHorizontal="85dp">
-
-    </EditText>
 
     <Button
         android:layout_width="wrap_content"
@@ -58,10 +68,10 @@
         android:text="Login"
         android:id="@+id/login"
         android:textSize="25dp"
-        android:layout_marginTop="450dp"
-        android:layout_marginLeft="50dp">
-
-    </Button>
+        android:layout_marginTop="520dp"
+        android:layout_marginLeft="50dp"
+        android:backgroundTint="@color/button_yellow"
+        android:textColor="@color/button_yellow_text" />
 
     <Button
         android:layout_width="wrap_content"
@@ -69,9 +79,9 @@
         android:text="Sign up"
         android:id="@+id/signup"
         android:textSize="25dp"
-        android:layout_marginTop="450dp"
-        android:layout_marginLeft="233dp">
-
-    </Button>
+        android:layout_marginTop="520dp"
+        android:layout_marginLeft="233dp"
+        android:backgroundTint="@color/button_orange"
+        android:textColor="@color/button_on_orange" />
 
 </RelativeLayout>

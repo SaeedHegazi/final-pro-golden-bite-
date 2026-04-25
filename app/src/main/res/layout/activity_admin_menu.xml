@@ -8,45 +8,95 @@
     android:padding="8dp"
     tools:context=".adminMenu">
 
+
+    <LinearLayout
+        android:id="@+id/linear2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/button_bar"
+        android:layout_marginBottom="8dp"
+        android:orientation="vertical">
+
         <TextView
             android:id="@+id/text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Admin's Menu"
+            android:textStyle="bold"
             android:textSize="50dp"/>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:text="Category"
+            android:textSize="16sp" />
 
-
-        <LinearLayout
-            android:layout_alignParentBottom="true"
+        <Spinner
+            android:id="@+id/change_category_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/linear2"
-            android:orientation="horizontal">
+            android:layout_marginBottom="16dp"
+            android:entries="@array/menu_categories"
+            android:minHeight="48dp" />
 
-            <Button
-                android:layout_marginRight="5dp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="goBack"
-                android:text="go back" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Select a product to edit"
+            android:textSize="16sp" />
 
-            <Button
-                android:id="@+id/ch"
-                android:layout_marginRight="5dp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="change " />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/change_products_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            tools:listitem="@layout/item_product" />
 
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="addP"
-                android:text="add product" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/button_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:elevation="4dp"
+        android:orientation="horizontal">
 
-        </LinearLayout>
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:onClick="goBack"
+            android:text="go back"
+            android:backgroundTint="@color/button_orange"
+            android:textColor="@color/button_on_orange" />
+
+        <Button
+            android:id="@+id/ch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:onClick="editProduct"
+            android:text="edit product"
+            android:backgroundTint="@color/button_yellow"
+            android:textColor="@color/button_yellow_text" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:onClick="addP"
+            android:text="add product"
+            android:backgroundTint="@color/button_orange"
+            android:textColor="@color/button_on_orange" />
+
+    </LinearLayout>
 
 </RelativeLayout>

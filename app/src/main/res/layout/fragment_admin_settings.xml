@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/listSettings"
-            android:divider="#BEE0E4"
+            android:divider="#FF9800"
             android:dividerHeight="3dp"/>
 
     </LinearLayout>

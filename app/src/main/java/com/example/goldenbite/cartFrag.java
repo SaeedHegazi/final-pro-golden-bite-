@@ -1,26 +1,310 @@
 package com.example.goldenbite;
 
+import static androidx.core.content.ContextCompat.getSystemService;
+
+import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.firebase.messaging.FirebaseMessaging;
+
+import java.util.regex.Pattern;
 
 public class cartFrag extends Fragment {
 
+    private static final Pattern EXPIRY_MM_YY = Pattern.compile("^(0[1-9]|1[0-2])/([0-9]{2})$");
+
+    private CartAdapter adapter;
+    private TextView emptyView;
+    private RecyclerView recyclerView;
+    private EditText customerName;
+    private EditText phone;
+    private static String phoneNum;
+    public static String getCustomerPhoneNum() {
+        return phoneNum != null ? phoneNum : "";
+    }
+    private CheckBox delivery;
+    private CheckBox cash;
+    private CheckBox visa;
+    private EditText cardNumber;
+    private EditText cardExpiry;
+    private EditText cardCvv;
+    private Button orderButton;
+
+    Spinner spinner;
+
 
     public cartFrag() {
-        // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_cart, container, false);
+        View root = inflater.inflate(R.layout.fragment_cart, container, false);
+        emptyView = root.findViewById(R.id.cart_empty);
+        recyclerView = root.findViewById(R.id.cart_recycler);
+        customerName = root.findViewById(R.id.cart_customer_name);
+        phone = root.findViewById(R.id.cart_phone);
+        delivery = root.findViewById(R.id.cart_delivery);
+        cash = root.findViewById(R.id.cart_cash);
+        visa = root.findViewById(R.id.cart_visa);
+        cardNumber = root.findViewById(R.id.cart_card_number);
+        cardExpiry = root.findViewById(R.id.cart_card_expiry);
+        cardCvv = root.findViewById(R.id.cart_card_cvv);
+        orderButton = root.findViewById(R.id.cart_order);
+        spinner = root.findViewById(R.id.spinnerCountries);
+
+        ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(
+                requireContext(),
+                R.array.countries_array,
+                android.R.layout.simple_spinner_item
+        );
+
+        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter1);
+
+        int position = adapter1.getPosition("Israel");
+        spinner.setSelection(position);
+
+
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        adapter = new CartAdapter();
+        recyclerView.setAdapter(adapter);
+        refreshEmptyState();
+
+        orderButton.setOnClickListener(v -> submitOrder());
+        return root;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refreshCart();
+    }
+
+    public void refreshCart() {
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+            refreshEmptyState();
+        }
+    }
+
+    private void refreshEmptyState() {
+        boolean empty = MainActivity2.cartItems.isEmpty();
+        emptyView.setVisibility(empty ? View.VISIBLE : View.GONE);
+        recyclerView.setVisibility(empty ? View.GONE : View.VISIBLE);
+    }
+
+    private void toast(String message) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+    }
+
+    private void submitOrder() {
+        if (MainActivity2.cartItems.isEmpty()) {
+            toast(getString(R.string.order_error_cart_empty));
+            return;
+        }
+
+        String name = customerName.getText() != null ? customerName.getText().toString().trim() : "";
+        String phoneStr = phone.getText() != null ? phone.getText().toString().trim() : "";
+        if (TextUtils.isEmpty(name)) {
+            toast(getString(R.string.order_error_name));
+            return;
+        }
+        if (TextUtils.isEmpty(phoneStr)) {
+            toast(getString(R.string.order_error_phone));
+            return;
+        }
+
+        boolean cashOn = cash.isChecked();
+        boolean visaOn = visa.isChecked();
+        if (cashOn && visaOn) {
+            toast(getString(R.string.order_error_payment_both));
+            return;
+        }
+        if (!cashOn && !visaOn) {
+            toast(getString(R.string.order_error_payment_none));
+            return;
+        }
+
+        String purchase;
+        String panValue = "";
+        String cvvValue = "";
+        if (visaOn) {
+            String digits = cardDigitsOnly(cardNumber.getText() != null ? cardNumber.getText().toString() : "");
+            String expiry = cardExpiry.getText() != null ? cardExpiry.getText().toString().trim() : "";
+            String cvv = cardCvv.getText() != null ? cardCvv.getText().toString().trim() : "";
+
+            if (digits.length() < 13 || digits.length() > 19) {
+                toast(getString(R.string.order_error_card_number));
+                return;
+            }
+            if (!EXPIRY_MM_YY.matcher(expiry).matches()) {
+                toast(getString(R.string.order_error_card_expiry));
+                return;
+            }
+            if (!cvv.matches("\\d+") || (cvv.length() != 3 && cvv.length() != 4)) {
+                toast(getString(R.string.order_error_card_cvv));
+                return;
+            }
+            purchase = "visa";
+            panValue = digits;
+            cvvValue = cvv;
+        } else {
+            purchase = "cash";
+        }
+
+        double total = 0;
+        for (Cart c : MainActivity2.cartItems) {
+            total += (double) c.getPrice() * c.getCount();
+        }
+        if (delivery.isChecked()) {
+            total += 20;
+        }
+
+        String info = buildOrderInfo(name, delivery.isChecked());
+        phoneNum = phoneStr;
+
+        Order order;
+
+        order = new Order(info, phoneStr, purchase, total, false, true, panValue, cvvValue);
+        order.saveOrder();
+        toast(getString(R.string.order_placed));
+        scheduleOrderReminder();
+        new OrderReminderReceiver();
+    }
+
+    private static String cardDigitsOnly(String raw) {
+        if (raw == null) return "";
+        StringBuilder sb = new StringBuilder(raw.length());
+        for (int i = 0; i < raw.length(); i++) {
+            char ch = raw.charAt(i);
+            if (ch >= '0' && ch <= '9') {
+                sb.append(ch);
+            }
+        }
+        return sb.toString();
+    }
+
+
+    private String buildOrderInfo(String name, boolean isDelivery) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Customer: ").append(name).append("\n");
+        sb.append("Delivery: ").append(isDelivery ? "yes" : "no").append("\n");
+        sb.append("Products:\n");
+        for (Cart c : MainActivity2.cartItems) {
+            sb.append(" - ")
+                    .append(c.getPname())
+                    .append(" x").append(c.getCount())
+                    .append(" (").append(c.getSize()).append(")\n");
+        }
+        return sb.toString().trim();
+    }
+
+    private class CartAdapter extends RecyclerView.Adapter<CartAdapter.VH> {
+
+        @NonNull
+        @Override
+        public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_cart, parent, false);
+            return new VH(v);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull VH holder, int position) {
+            Cart c = MainActivity2.cartItems.get(position);
+            holder.name.setText(c.getPname());
+            holder.count.setText(String.valueOf(c.getCount()));
+            holder.size.setText(c.getSize());
+            holder.price.setText(String.valueOf(c.getPrice()));
+
+            holder.itemView.setOnClickListener(v -> {
+                int pos = holder.getBindingAdapterPosition();
+                if (pos == RecyclerView.NO_POSITION) {
+                    return;
+                }
+                final Cart line = MainActivity2.cartItems.get(pos);
+                new MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(R.string.cart_delete_title)
+                        .setMessage(getString(R.string.cart_delete_message, line.getPname()))
+                        .setNegativeButton(R.string.cart_delete_cancel, null)
+                        .setPositiveButton(R.string.cart_delete_confirm, (dialog, which) -> {
+                            MainActivity2.cartItems.remove(line);
+                            refreshCart();
+                        })
+                        .show();
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return MainActivity2.cartItems.size();
+        }
+
+        class VH extends RecyclerView.ViewHolder {
+            final TextView name;
+            final TextView count;
+            final TextView size;
+            final TextView price;
+
+            VH(View itemView) {
+                super(itemView);
+                name = itemView.findViewById(R.id.cart_item_name);
+                count = itemView.findViewById(R.id.cart_item_count);
+                size = itemView.findViewById(R.id.cart_item_size);
+                price = itemView.findViewById(R.id.cart_item_price);
+            }
+        }
+    }
+
+    @SuppressLint("ScheduleExactAlarm")
+    private void scheduleOrderReminder() {
+
+        Intent intent = new Intent(getContext(), OrderReminderReceiver.class);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                getContext(),
+                1001,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        AlarmManager alarmManager = (AlarmManager) requireContext().getSystemService(Context.ALARM_SERVICE);
+
+        long triggerTime = System.currentTimeMillis() + 5 * 1000;
+
+        if (alarmManager != null) {
+            alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerTime,
+                    pendingIntent
+            );
+        }
     }
 }
+
